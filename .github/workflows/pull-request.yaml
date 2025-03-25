@@ -2,7 +2,7 @@ name: Terraform Plan on PR
 
 on:
   pull_request:
-  
+
 jobs:
   terraform-plan:
     name: Terraform Plan
@@ -22,7 +22,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          region: us-east-1
+          region: ap-south-1
 
       - name: Terraform Init
         run: terraform init
