@@ -1,0 +1,53 @@
+name: Terraform Plan on PR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛎️ Checkout Code
+        uses: actions/checkout@v3
+
+      - name: 🔧 Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          region: us-east-1
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform apply
+
+      - name: Post Plan Results on PR
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const planOutput = fs.readFileSync('tfplan', 'utf8');
+            const summary = `
+            ### Terraform Plan Summary
+            \`\`\`
+            ${planOutput}
+            \`\`\`
+            `;
+            github.rest.issues.createComment({
+              issue_number: context.payload.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
