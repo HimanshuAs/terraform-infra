@@ -7,12 +7,14 @@ jobs:
   terraform-plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
+    environment: dev
 
     steps:
       - name: 🛎️ Checkout Code
         uses: actions/checkout@v3
 
       - name: 🕵️ Debug AWS Secrets
+        # environment: secret
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
